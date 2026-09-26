@@ -1394,6 +1394,8 @@ macromap<ContextT>::rescan_replacement_list(token_type const &curr_token,
         typename ContainerT::iterator begin_it = replacement_list.begin();
         typename ContainerT::iterator end_it = replacement_list.end();
 
+        // An object-like macro's replacement list does not contain the tokens
+        // following its invocation, which may complete __has_include(...).
         expand_whole_tokensequence(
             expanded, begin_it, end_it,
             expand_operator_defined, expand_operator_has_include);
@@ -1643,7 +1645,8 @@ macromap<ContextT>::expand_macro(ContainerT &expanded,
     rescan_replacement_list(
         curr_token, macro_def, replacement_list,
         expanded_list, expand_operator_defined,
-        expand_operator_has_include, first, last);
+        expand_operator_has_include && macro_def.is_functionlike,
+        first, last);
 
     ctx.get_hooks().rescanned_macro(ctx.derived(), expanded_list);
 
